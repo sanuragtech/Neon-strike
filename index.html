@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>NEON STRIKE: BATTLE ARENA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070914;--panel:#0f1330;--line:#2a2f66;--cy:#27e6ff;--vi:#8a5cff;--mg:#ff3fb4;--tx:#e8ecff;--mu:#8e96c8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070914}}
+*{box-sizing:border-box;margin:0}html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font:500 16px/1.4 Rajdhani,system-ui,sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
+h1,h2,h3,button,.d{font-family:'Chakra Petch',Rajdhani,system-ui,sans-serif}
+.scr{position:fixed;inset:0;display:none;overflow:auto;padding:max(16px,env(safe-area-inset-top)) 18px 24px}
+.scr.on{display:block}
+#bgc{position:fixed;inset:0;z-index:-1}
+.hero{min-height:100%;display:flex;flex-direction:column;justify-content:center;max-width:760px;margin:auto}
+h1{font-size:clamp(40px,11vw,92px);line-height:.95;letter-spacing:-.02em;font-weight:700;background:linear-gradient(95deg,var(--cy),var(--vi) 60%,var(--mg));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:clamp(18px,4vw,28px);letter-spacing:.3em;color:var(--mu);margin:6px 0 20px}
+p.l{max-width:56ch;color:#c5cbf2;font-size:18px;margin-bottom:22px}
+.btn{background:linear-gradient(120deg,var(--cy),var(--vi));color:#05061a;border:0;padding:14px 26px;font-weight:700;font-size:18px;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);cursor:pointer;transition:transform .15s,filter .15s}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.15)}.btn:focus-visible,.card:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.btn.g{background:var(--panel);color:var(--tx);border:1px solid var(--line);clip-path:none}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.note{border-left:3px solid var(--mg);background:#1a1030;padding:10px 14px;color:#d9c6f5;font-size:15px;max-width:62ch;margin-top:20px}
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:26px}
+.feat div{border-top:2px solid var(--vi);padding:10px 2px;color:var(--mu)}.feat b{color:var(--tx);display:block;font-family:'Chakra Petch'}
+.lob{max-width:1000px;margin:auto}.lob h2{font-size:28px;margin:18px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);padding:10px;cursor:pointer;text-align:left;color:var(--tx);transition:border-color .15s,transform .15s}
+.card.sel{border-color:var(--cy);box-shadow:0 0 18px #27e6ff44 inset}.card:hover{transform:translateY(-2px)}
+.card canvas{width:100%;height:92px;display:block}.card small{color:var(--mu);display:block;font-size:14px}
+.card b{font-family:'Chakra Petch'}
+.pv{display:flex;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);padding:12px;margin-top:10px}
+.pv canvas{width:120px;height:120px;flex:none}
+#game{position:fixed;inset:0;width:100%;height:100%;display:none;touch-action:none;cursor:crosshair}
+#hud{position:fixed;inset:0;pointer-events:none;display:none;font-family:'Chakra Petch'}
+#hud .t{position:absolute;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);font-size:26px;text-shadow:0 0 10px var(--cy)}
+#hud .sb{position:absolute;top:max(8px,env(safe-area-inset-top));right:10px;font-size:13px;background:#070914cc;padding:6px 8px;border:1px solid var(--line);min-width:130px}
+#hud .kf{position:absolute;top:max(8px,env(safe-area-inset-top));left:10px;font-size:13px;color:#cfd5ff}
+#hud .bar{position:absolute;left:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:190px}
+.bar i{display:block;height:10px;background:#1b1f4a;margin-top:4px}.bar i b{display:block;height:100%;background:linear-gradient(90deg,var(--mg),var(--cy))}
+#cd{position:fixed;inset:0;display:none;place-items:center;font:700 120px 'Chakra Petch';color:var(--cy);text-shadow:0 0 30px var(--vi);pointer-events:none}
+.ab{position:fixed;display:none;gap:10px;right:12px;top:34%;flex-direction:column;align-items:flex-end}
+.ab button{width:64px;height:64px;border-radius:50%;border:2px solid var(--cy);background:#0f1330dd;color:var(--tx);font-size:13px;position:relative;overflow:hidden}
+.ab button i{position:absolute;left:0;bottom:0;width:100%;background:#000a;height:0}
+.ab .r{display:flex;gap:10px}
+.res{max-width:560px;margin:auto;padding-top:5vh}.res table{width:100%;border-collapse:collapse;margin:14px 0}
+.res td,.res th{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left}.me{color:var(--cy)}
+.pg{max-width:640px;margin:auto}.pg h2{margin:10px 0}.pg li{margin:6px 0 6px 20px}
+input{width:100%;background:#0b0f2a;border:1px solid var(--line);color:var(--tx);padding:12px;font:inherit;font-size:17px;margin:6px 0}
+label{color:var(--mu);font-size:15px;display:block;margin-top:8px}
+.msg{min-height:24px;margin:10px 0;color:#ffb3d9}.msg.ok{color:#8dffcf}
+.st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.st div{background:var(--panel);border:1px solid var(--line);padding:10px;color:var(--mu);text-align:center}.st b{display:block;font:700 24px 'Chakra Petch';color:var(--tx)}
+.xpb{height:10px;background:#1b1f4a;margin:8px 0}.xpb b{display:block;height:100%;background:linear-gradient(90deg,var(--cy),var(--vi));width:0}
+.acct{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap}.acct .btn{padding:10px 16px;font-size:16px}
+.pg td,.pg th{padding:6px;border-bottom:1px solid var(--line);text-align:left}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<canvas id="bgc"></canvas>
+
+<section class="scr on" id="s-land"><div class="hero">
+<h1>NEON STRIKE</h1><div class="sub d">BATTLE ARENA</div>
+<p class="l">Pick a hero and a robotic companion, then fight through a neon arena with energy weapons and special powers. Free to play in your browser.</p>
+<div class="row"><button class="btn" data-go="lobby">Play practice</button><button class="btn g" data-go="rules">Fair-play rules</button><span class="acct"></span></div>
+<div class="feat"><div><b>6 original heroes</b>Three male, three female. Each has a power with a cooldown.</div><div><b>4 companions</b>Pets give limited help. They never aim or shoot.</div><div><b>3 energy weapons</b>Pulse, burst and plasma, each with its own feel.</div></div>
+<div class="note"><b>Build status:</b> this is the playable single-player practice arena (phase 1). Accounts and saved practice progress work once you connect a database (see SETUP.md). Online rooms and 10-player matches are not built yet. Opponents here are bots and are labelled BOT.</div>
+</div></section>
+
+<section class="scr" id="s-lobby"><div class="lob">
+<div class="row" style="justify-content:space-between"><h2 style="margin:0">Lobby</h2><span class="acct"></span><button class="btn g" data-go="land">Back</button></div>
+<h2>Choose hero</h2><div class="grid" id="heroes"></div>
+<div class="pv"><canvas id="pvc" width="240" height="240"></canvas><div id="pvt"></div></div>
+<h2>Choose companion</h2><div class="grid" id="pets"></div>
+<h2>Choose weapon</h2><div class="grid" id="weps"></div>
+<div class="row" style="margin-top:22px"><button class="btn" id="go">Start practice match</button>
+<button class="btn g" disabled>Public match (needs server)</button><button class="btn g" disabled>Private room (needs server)</button></div>
+<div class="note">Practice: first to 15 eliminations or 3 minutes. Results here don't change any ranking.</div>
+</div></section>
+
+<canvas id="game"></canvas>
+<div id="hud"><div class="t" id="tm">3:00</div><div class="kf" id="kf"></div><div class="sb" id="sb"></div>
+<div class="bar"><span id="hpt"></span><i><b id="hpb"></b></i></div></div>
+<div id="cd"></div>
+<div class="ab" id="ab"><div class="r"><button id="bW">Weapon</button></div><div class="r"><button id="bP">Pet<i></i></button><button id="bA">Power<i></i></button></div></div>
+
+<section class="scr" id="s-res"><div class="res"><h1 id="rt" style="font-size:56px">VICTORY</h1><table id="rtab"></table>
+<div class="row"><button class="btn" id="again">Rematch</button><button class="btn g" data-go="lobby">Back to lobby</button></div>
+<div class="note" id="rx" style="display:none"></div><div class="note">Reporting players isn't needed here: all opponents were bots.</div></div></section>
+
+<section class="scr" id="s-rules"><div class="pg"><h2>Fair-play rules</h2><ul>
+<li>No cheating, exploit abuse or modified clients.</li><li>No scripts or tools to manipulate scores.</li><li>No harassment, threats or abusive usernames.</li><li>Don't use bugs on purpose.</li><li>No spam or disruptive behavior.</li><li>Respect other players and follow the terms.</li></ul>
+<p class="l">Privacy policy and terms will be added once accounts exist. Right now this page stores nothing and sets no cookies.</p><button class="btn" data-go="land">Back</button></div></section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.78.0/dist/umd/supabase.js"></script>
+<section class="scr" id="s-auth"><div class="pg"><div class="row" id="tabs"></div><h2 id="at"></h2>
+<div id="gu"><label for="un">Username (3-16 letters, numbers, _)</label><input id="un" autocomplete="username" maxlength="16"></div>
+<div id="ge"><label for="em">Email</label><input id="em" type="email" autocomplete="email"></div>
+<div id="gp"><label for="pw">Password (8 or more characters)</label><input id="pw" type="password"></div>
+<div class="msg" id="am" role="status"></div>
+<div class="row"><button class="btn" id="asub">Continue</button><button class="btn g" data-go="land">Back</button></div></div></section>
+<section class="scr" id="s-cfg"><div class="pg"><h2>Connect your database</h2><p class="l">Paste your Supabase Project URL and your publishable key (starts with sb_publishable_). A legacy anon key also works. Never paste a secret or service_role key. Steps are in SETUP.md.</p>
+<label for="cu">Project URL</label><input id="cu" placeholder="https://xxxx.supabase.co" autocomplete="off"><label for="ck">Publishable key</label><input id="ck"><label for="cs">Your website address for email links (optional, e.g. https://yourname.github.io/neon-strike/)</label><input id="cs" placeholder="leave empty to use this page's address" autocomplete="off"><div class="msg" id="cm"></div>
+<div class="row"><button class="btn" id="csv">Save and reload</button><button class="btn g" data-go="land">Back</button></div></div></section>
+<section class="scr" id="s-prof"><div class="pg"><h2 id="pn"></h2><div class="xpb"><b id="px"></b></div><small id="pxt" style="color:var(--mu)"></small><div class="st" id="pst"></div><h3>Recent matches</h3><table id="ph" style="width:100%;border-collapse:collapse"></table>
+<div class="row" style="margin-top:18px"><button class="btn" data-go="lobby">Lobby</button><button class="btn g" onclick="logout()">Log out</button><button class="btn g" onclick="delAcct()">Delete account</button></div></div></section>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const HEROES=[
+{n:'VEX',g:'M',c:'#27e6ff',c2:'#0a4a8a',sides:3,r:15,spd:250,hp:100,ab:'dash',role:'Skirmisher',bio:'Cyber-ninja with a blue energy blade. Dash to close or escape.'},
+{n:'TITAN',g:'M',c:'#ff8a3d',c2:'#5a2a10',sides:6,r:20,spd:190,hp:150,ab:'shield',role:'Defender',bio:'Exosuit arena defender. Shield cuts damage for a few seconds.'},
+{n:'PHANTOM',g:'M',c:'#9aa6ff',c2:'#232a66',sides:4,r:14,spd:240,hp:100,ab:'boost',role:'Scout',bio:'Stealth scout with a holo visor. Short speed and fire-rate boost.'},
+{n:'NOVA',g:'F',c:'#c06bff',c2:'#3a1a7a',sides:5,r:15,spd:235,hp:110,ab:'dash',role:'Energy specialist',bio:'Violet and cyan suit. Dash through trouble.'},
+{n:'RAVEN',g:'F',c:'#ff3fb4',c2:'#2a0f33',sides:3,r:14,spd:255,hp:95,ab:'boost',role:'Tactical scout',bio:'Dark suit, holo gear. Fast and fragile.'},
+{n:'AETHER',g:'F',c:'#6dffcf',c2:'#0d4a4a',sides:8,r:17,spd:215,hp:120,ab:'shield',role:'Tech specialist',bio:'Luminous armor with animated energy. Sturdy support.'}];
+const ABN={dash:'Dash (1s burst, 5s cooldown)',shield:'Shield (-70% damage 3s, 9s cooldown)',boost:'Boost (+40% speed, faster fire 3s, 10s cooldown)'};
+const PETS=[{n:'VOLT FOX',c:'#ffb02e',d:'Highlights enemies within 380px for 3s. 12s cooldown.',cd:12},
+{n:'MEDI DRONE',c:'#4dffa0',d:'Restores 30 shield/health once. 20s cooldown.',cd:20},
+{n:'PULSE CAT',c:'#b57cff',d:'Reveals hidden health pickups for 6s. 10s cooldown.',cd:10},
+{n:'GUARDIAN BOT',c:'#5ec8ff',d:'Pulse pushes nearby enemies back and blocks one hit. 14s cooldown.',cd:14}];
+const WEPS=[{n:'PULSE BLASTER',c:'#27e6ff',rate:.17,dmg:12,spd:720,d:'Balanced rapid fire.'},
+{n:'BURST RAY',c:'#ff3fb4',rate:.7,dmg:9,spd:820,n3:3,d:'Three-shot spread burst.'},
+{n:'PLASMA LAUNCHER',c:'#9cff4d',rate:1.15,dmg:34,spd:380,splash:70,d:'Slow shell, area damage.'}];
+let sel={h:0,p:0,w:0};
+// ---- drawing helpers
+function poly(x,t,cx,cy,r,n,rot){x.beginPath();for(let i=0;i<n;i++){const a=rot+i*6.283/n;x[i?'lineTo':'moveTo'](cx+Math.cos(a)*r,cy+Math.sin(a)*r)}x.closePath()}
+function drawHero(x,h,cx,cy,sc,rot,t,wc){x.save();const r=h.r*sc;x.shadowColor=h.c;x.shadowBlur=14;poly(x,0,cx,cy,r,h.sides,rot);x.fillStyle=h.c2;x.fill();x.lineWidth=2.5;x.strokeStyle=h.c;x.stroke();x.shadowBlur=0;x.save();x.translate(cx,cy);x.rotate(rot);x.fillStyle=wc||h.c;x.fillRect(r*.45,-r*.14,r*1.05,r*.28);x.restore();
+x.beginPath();x.arc(cx,cy,r*.38,0,7);x.fillStyle=h.c;x.fill();
+x.fillStyle=h.g=='F'?'#fff':h.c;x.beginPath();x.arc(cx+Math.cos(rot)*r*.9,cy+Math.sin(rot)*r*.9,r*.22,0,7);x.fill();x.restore()}
+function drawPet(x,p,cx,cy,sc,t){x.save();x.shadowColor=p.c;x.shadowBlur=10;x.fillStyle=p.c;const b=Math.sin(t*4)*2*sc;
+x.beginPath();x.ellipse(cx,cy+b,7*sc,5*sc,0,0,7);x.fill();x.beginPath();x.moveTo(cx+4*sc,cy-3*sc+b);x.lineTo(cx+8*sc,cy-9*sc+b);x.lineTo(cx+9*sc,cy-2*sc+b);x.fill();x.restore()}
+function thumb(c,fn){const x=c.getContext('2d');c.width=c.clientWidth*2||200;c.height=184;x.clearRect(0,0,c.width,c.height);fn(x,c.width/2,92)}
+// ---- lobby UI
+function card(host,arr,key,fill){host.innerHTML='';arr.forEach((o,i)=>{const b=document.createElement('button');b.className='card'+(sel[key]==i?' sel':'');b.innerHTML='<canvas></canvas><b>'+o.n+'</b><small>'+fill(o)+'</small>';b.onclick=()=>{sel[key]=i;lobby();saveSettings()};host.append(b);
+const cv=b.firstChild;requestAnimationFrame(()=>thumb(cv,(x,cx,cy)=>key=='h'?drawHero(x,o,cx,cy,2.2,-.8):key=='p'?drawPet(x,o,cx,cy,5,0):(x.shadowColor=o.c,x.shadowBlur=14,x.fillStyle=o.c,x.fillRect(cx-60,cy-8,120,16))))})}
+function lobby(){card($('#heroes'),HEROES,'h',o=>(o.g=='M'?'Male':'Female')+' · '+o.role);card($('#pets'),PETS,'p',o=>o.d);card($('#weps'),WEPS,'w',o=>o.d);
+const h=HEROES[sel.h];$('#pvt').innerHTML='<h3>'+h.n+'</h3><div>'+h.bio+'</div><small style="color:var(--mu)">HP '+h.hp+' · Speed '+h.spd+' · '+ABN[h.ab]+'</small>'}
+let pvT=0;(function pv(t){const c=$('#pvc');if($('#s-lobby').classList.contains('on')){const x=c.getContext('2d');x.clearRect(0,0,240,240);drawHero(x,HEROES[sel.h],120,120,3.4,t/700,t,WEPS[sel.w].c);drawPet(x,PETS[sel.p],190+Math.cos(t/500)*10,170,3,t/1000)}requestAnimationFrame(pv)})(0);
+function go(n){$$('.scr').forEach(s=>s.classList.toggle('on',s.id=='s-'+n));if(n=='lobby')lobby()}
+$$('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+// ---- background particles
+(function(){const c=$('#bgc'),x=c.getContext('2d');let P=[];function rs(){c.width=innerWidth;c.height=innerHeight;P=Array.from({length:50},()=>({x:Math.random()*c.width,y:Math.random()*c.height,v:8+Math.random()*20,r:Math.random()*1.6+.4}))}rs();addEventListener('resize',rs);
+const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;let l=0;(function f(t){const dt=Math.min(.05,(t-l)/1000||0);l=t;x.fillStyle='#070914';x.fillRect(0,0,c.width,c.height);const g=x.createRadialGradient(c.width*.7,c.height*.2,0,c.width*.7,c.height*.2,c.height);g.addColorStop(0,'#2a1a6a66');g.addColorStop(1,'#0000');x.fillStyle=g;x.fillRect(0,0,c.width,c.height);
+x.fillStyle='#27e6ff88';P.forEach(p=>{if(!rm)p.y-=p.v*dt;if(p.y<0)p.y=c.height;x.fillRect(p.x,p.y,p.r,p.r)});requestAnimationFrame(f)})(0)})();
+// ---- audio
+let AC;function beep(f,d,v=.04){try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.type='square';g.gain.value=v;g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+// ---- game
+const cv=$('#game'),cx=cv.getContext('2d');const W=1800,H=1100,TOUCH=matchMedia('(pointer:coarse)').matches;
+const OB=[[300,250,160,40],[300,250,40,160],[800,150,200,40],[1400,250,160,40],[1520,250,40,160],[700,500,400,50],[820,520,160,300],[250,780,40,160],[250,900,160,40],[1450,780,40,160],[1390,900,160,40],[820,950,200,40],[1000,250,40,160],[600,300,40,120]];
+let G=null,keys={},mv={x:0,y:0};const IN={src:'mouse',mx:0,my:0,seen:false,fireM:false,aimS:null,movS:null,tap:null,touchSeen:false};const HAS_TOUCH=navigator.maxTouchPoints>0;
+const angDiff=(a,b)=>Math.abs(Math.atan2(Math.sin(a-b),Math.cos(a-b)));
+function turn(e,t,dt,snap){const d=Math.atan2(Math.sin(t-e.ang),Math.cos(t-e.ang));e.ang+=snap?d:d*(1-Math.exp(-30*dt))}
+function toWorld(px,py){return{x:px+G.cam.x-(G.sx||0),y:py+G.cam.y-(G.sx||0)}}
+function playerAim(e,dt){let t=e.ang,snap=false;
+ if(IN.tap&&IN.tap.t>0){IN.tap.t-=dt;t=Math.atan2(IN.tap.y-e.y,IN.tap.x-e.x);snap=true}
+ else if(IN.src=='touch'){if(IN.aimS&&IN.aimS.mag>.2)t=IN.aimS.a}
+ else if(IN.seen){const w=toWorld(IN.mx,IN.my);G.tw=w;t=Math.atan2(w.y-e.y,w.x-e.x)}
+ e.aim=t;turn(e,t,dt,snap)}
+function wantFire(e){const ok=angDiff(e.ang,e.aim)<.5;
+ if(IN.tap&&IN.tap.t>0&&!IN.tap.done){if(ok&&e.cdW<=0){IN.tap.done=true;return true}return false}
+ const f=IN.src=='mouse'?IN.fireM:!!(IN.aimS&&IN.aimS.mag>.2);return ok&&f}
+function drawAim(x,me){if(me.hp<=0)return;const mouse=IN.src=='mouse'&&IN.seen&&G.tw;const L=mouse?Math.min(Math.hypot(G.tw.x-me.x,G.tw.y-me.y),520):240;
+ x.save();x.setLineDash([8,10]);x.strokeStyle=WEPS[me.w].c;x.globalAlpha=.6;x.lineWidth=2;x.beginPath();x.moveTo(me.x+Math.cos(me.ang)*me.h.r*1.5,me.y+Math.sin(me.ang)*me.h.r*1.5);x.lineTo(me.x+Math.cos(me.ang)*L,me.y+Math.sin(me.ang)*L);x.stroke();x.setLineDash([]);
+ const px=mouse?G.tw.x:me.x+Math.cos(me.ang)*L,py=mouse?G.tw.y:me.y+Math.sin(me.ang)*L;x.beginPath();x.arc(px,py,10,0,7);x.moveTo(px-16,py);x.lineTo(px-5,py);x.moveTo(px+5,py);x.lineTo(px+16,py);x.moveTo(px,py-16);x.lineTo(px,py-5);x.moveTo(px,py+5);x.lineTo(px,py+16);x.stroke();x.restore()}
+function drawSticks(x){if(!HAS_TOUCH&&!IN.touchSeen)return;const w=cv.width,h=cv.height;[['movS',110,h-110,'#27e6ff'],['aimS',w-110,h-110,'#ff3fb4']].forEach(([k,hx,hy,c])=>{const s=IN[k];x.save();x.strokeStyle=c;x.lineWidth=3;x.globalAlpha=s?.7:.25;const bx=s?s.ox:hx,by=s?s.oy:hy;x.beginPath();x.arc(bx,by,60,0,7);x.stroke();
+ const l=s?Math.min(60,Math.hypot(s.x-s.ox,s.y-s.oy)):0,a=s?Math.atan2(s.y-s.oy,s.x-s.ox):0;x.fillStyle=c;x.beginPath();x.arc(bx+Math.cos(a)*l,by+Math.sin(a)*l,24,0,7);x.fill();x.restore()})}
+const NAMES=['Kilo','Zed','Mira','Echo','Juno','Rex','Sol'];
+function ent(h,name,bot,w){const s=spawn();return{h,name,bot,x:s.x,y:s.y,hp:h.hp,sh:0,ang:0,vx:0,vy:0,inv:2,sc:0,dt:0,w,cdW:0,cdA:0,cdP:0,fl:0,act:{},pet:{x:s.x,y:s.y},rsp:0,ai:{t:0,sx:1}}}
+function spawn(){let best,bd=-1;for(let k=0;k<14;k++){const p={x:80+Math.random()*(W-160),y:80+Math.random()*(H-160)};if(hitOb(p.x,p.y,20))continue;let d=9e9;(G?.ents||[]).forEach(e=>{if(e.hp>0)d=Math.min(d,Math.hypot(e.x-p.x,e.y-p.y))});if(d>bd){bd=d;best=p}}return best||{x:100,y:100}}
+function hitOb(x,y,r){return OB.some(o=>x>o[0]-r&&x<o[0]+o[2]+r&&y>o[1]-r&&y<o[1]+o[3]+r)}
+function newPickups(){return Array.from({length:6},()=>{const s=spawn();return{x:s.x,y:s.y,on:1,t:0}})}
+function start(){IN.movS=IN.aimS=IN.tap=null;mv.x=mv.y=0;IN.fireM=false;const me=ent(HEROES[sel.h],'YOU',false,sel.w);G={ents:[me],me,B:[],P:newPickups(),t:180,state:'cd',cd:3.2,kf:[],fx:[],cam:{x:0,y:0},shake:0};
+for(let i=0;i<5;i++){const h=HEROES[(sel.h+1+i)%6];G.ents.push(ent(h,'BOT '+NAMES[i],true,i%3))}
+cv.style.display='block';$('#hud').style.display='block';$('#cd').style.display='grid';$('#ab').style.display=HAS_TOUCH?'flex':'none';go('none');resize();last=performance.now();requestAnimationFrame(loop)}
+function resize(){cv.width=innerWidth;cv.height=innerHeight}addEventListener('resize',resize);
+function shoot(e){const W_=WEPS[e.w],boost=e.act.boost>0?.6:1;if(e.cdW>0)return;e.cdW=W_.rate*boost;beep(300+e.w*150,.06);
+const n=W_.n3||1;for(let i=0;i<n;i++){const a=e.ang+(n>1?(i-1)*.14:0)+(e.bot?(Math.random()-.5)*.25:0);G.B.push({x:e.x+Math.cos(a)*e.h.r*1.5,y:e.y+Math.sin(a)*e.h.r*1.5,vx:Math.cos(a)*W_.spd,vy:Math.sin(a)*W_.spd,o:e,w:W_,life:1.4})}}
+function hurt(e,d,o){if(e.hp<=0||e.inv>0)return;if(e.act.guard){e.act.guard=0;G.fx.push({x:e.x,y:e.y,r:30,c:'#5ec8ff',t:.3});return}if(e.act.shield>0)d*=.3;if(e.sh>0){const a=Math.min(e.sh,d);e.sh-=a;d-=a}e.hp-=d;e.fl=.12;if(e==G.me)G.shake=6;
+if(e.hp<=0){e.dt++;o.sc++;e.rsp=2.2;G.kf.unshift({t:3,s:o.name+' ▸ '+e.name});G.kf.length=4;G.fx.push({x:e.x,y:e.y,r:50,c:e.h.c,t:.5});beep(120,.25,.06)}}
+function useA(e){if(e.cdA>0||e.hp<=0)return;const t=e.h.ab;e.cdA={dash:5,shield:9,boost:10}[t];if(t=='dash'){e.act.dash=.18;e.dx=Math.cos(e.ang);e.dy=Math.sin(e.ang)}else e.act[t]=t=='boost'?3:3;beep(600,.12)}
+function useP(e){if(e.cdP>0||e.hp<=0)return;const p=e.pi!=null?e.pi:sel.p;e.cdP=PETS[p].cd;e.act.pet=3;
+if(p==1){e.hp=Math.min(e.h.hp,e.hp+30)}if(p==3){e.act.guard=1;G.ents.forEach(o=>{if(o!=e&&o.hp>0){const d=Math.hypot(o.x-e.x,o.y-e.y);if(d<200){o.x+=(o.x-e.x)/d*90;o.y+=(o.y-e.y)/d*90}}});G.fx.push({x:e.x,y:e.y,r:200,c:'#5ec8ff',t:.4})}
+if(p==2)e.act.cat=6;if(p==0)e.act.fox=3;beep(800,.15)}
+function move(e,dx,dy,dt){let s=e.h.spd*(e.act.boost>0?1.4:1);let vx=dx*s,vy=dy*s;if(e.act.dash>0){vx=e.dx*900;vy=e.dy*900}
+let nx=e.x+vx*dt,ny=e.y+vy*dt;if(!hitOb(nx,e.y,e.h.r*.8))e.x=nx;if(!hitOb(e.x,ny,e.h.r*.8))e.y=ny;e.x=Math.max(20,Math.min(W-20,e.x));e.y=Math.max(20,Math.min(H-20,e.y))}
+function splash(b,x,y){G.fx.push({x,y,r:b.w.splash||14,c:b.w.c,t:.25});if(b.w.splash)G.ents.forEach(e=>{if(e.hp>0&&Math.hypot(e.x-x,e.y-y)<b.w.splash+e.h.r)hurt(e,b.w.dmg*.7,b.o)})}
+let last=0;function loop(now){if(!G)return;const dt=Math.min(.05,(now-last)/1000);last=now;update(dt);if(!G)return;draw();requestAnimationFrame(loop)}
+function update(dt){const g=G,me=g.me;
+if(g.state=='cd'){g.cd-=dt;const n=Math.ceil(g.cd);$('#cd').textContent=n>0?n:'GO';if(g.cd<=-.5){g.state='play';$('#cd').style.display='none'}else if(g.cd>0){}}
+const live=g.state=='play';if(live){g.t-=dt;if(g.t<=0||g.ents.some(e=>e.sc>=15))return finish()}
+g.ents.forEach(e=>{e.cdW-=dt;e.cdA-=dt;e.cdP-=dt;e.inv-=dt;e.fl-=dt;for(const k in e.act)if(typeof e.act[k]=='number'&&k!='guard')e.act[k]-=dt;
+if(e.hp<=0){e.rsp-=dt;if(e.rsp<=0&&live){const s=spawn();Object.assign(e,{x:s.x,y:s.y,hp:e.h.hp,sh:0,inv:2.5,act:{}});if(e==me)IN.tap=null}return}
+if(!live)return;
+if(e==me){let dx=mv.x,dy=mv.y;if(keys.KeyW||keys.ArrowUp)dy-=1;if(keys.KeyS||keys.ArrowDown)dy+=1;if(keys.KeyA||keys.ArrowLeft)dx-=1;if(keys.KeyD||keys.ArrowRight)dx+=1;const m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m}
+playerAim(e,dt);move(e,dx,dy,dt);if(wantFire(e))shoot(e)}
+else{const T=g.ents.filter(o=>o!=e&&o.hp>0).sort((a,b)=>Math.hypot(a.x-e.x,a.y-e.y)-Math.hypot(b.x-e.x,b.y-e.y))[0];if(T){const d=Math.hypot(T.x-e.x,T.y-e.y);const ta=Math.atan2(T.y-e.y,T.x-e.x);turn(e,ta,dt);e.ai.t-=dt;if(e.ai.t<0){e.ai.t=.8+Math.random();e.ai.sx=Math.random()<.5?1:-1}
+const f=d>380?1:d<200?-.7:0;const px=-Math.sin(e.ang)*e.ai.sx*.7,py=Math.cos(e.ang)*e.ai.sx*.7;move(e,Math.cos(e.ang)*f+px,Math.sin(e.ang)*f+py,dt*.8);if(d<520&&angDiff(e.ang,ta)<.3)shoot(e);if(Math.random()<dt*.15)useA(e);if(e.hp<40&&Math.random()<dt)useP(e)}}
+e.pet.x+=(e.x-30-e.pet.x)*Math.min(1,dt*5);e.pet.y+=(e.y+26-e.pet.y)*Math.min(1,dt*5)});
+g.B.forEach(b=>{b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(hitOb(b.x,b.y,0)||b.x<0||b.y<0||b.x>W||b.y>H){b.life=0;splash(b,b.x,b.y);return}
+for(const e of g.ents){if(e!=b.o&&e.hp>0&&Math.hypot(e.x-b.x,e.y-b.y)<e.h.r+4){b.life=0;if(!b.w.splash)hurt(e,b.w.dmg,b.o);splash(b,b.x,b.y);break}}if(b.life<=0&&b.w.splash)splash(b,b.x,b.y)});g.B=g.B.filter(b=>b.life>0);
+g.P.forEach(p=>{if(!p.on){p.t-=dt;if(p.t<=0)p.on=1;return}g.ents.forEach(e=>{if(p.on&&e.hp>0&&Math.hypot(e.x-p.x,e.y-p.y)<28&&e.hp<e.h.hp+1){p.on=0;p.t=15;e.sh=Math.min(40,e.sh+25);e.hp=Math.min(e.h.hp,e.hp+20)}})});
+g.fx.forEach(f=>f.t-=dt);g.fx=g.fx.filter(f=>f.t>0);g.kf.forEach(k=>k.t-=dt);g.kf=g.kf.filter(k=>k.t>0);g.shake=Math.max(0,g.shake-dt*30);g.sx=g.shake?(Math.random()-.5)*g.shake:0;
+g.cam.x+=(me.x-cv.width/2-g.cam.x)*Math.min(1,dt*8);g.cam.y+=(me.y-cv.height/2-g.cam.y)*Math.min(1,dt*8);
+g.cam.x=Math.max(-100,Math.min(W-cv.width+100,g.cam.x));g.cam.y=Math.max(-100,Math.min(H-cv.height+100,g.cam.y));hud()}
+function hud(){const g=G,me=g.me,m=Math.max(0,Math.ceil(g.t));$('#tm').textContent=Math.floor(m/60)+':'+String(m%60).padStart(2,'0');
+$('#sb').innerHTML=[...g.ents].sort((a,b)=>b.sc-a.sc).map(e=>'<div class="'+(e==me?'me':'')+'">'+e.name+' '+e.sc+'/'+e.dt+'</div>').join('')+'<div style="color:var(--mu)">Target: 15</div>';
+$('#kf').innerHTML=g.kf.map(k=>k.s).join('<br>');$('#hpt').textContent='HP '+Math.max(0,Math.ceil(me.hp))+(me.sh>0?' +'+Math.ceil(me.sh):'')+' | '+WEPS[me.w].n+' [1-3] | Power [Space] '+(me.cdA>0?Math.ceil(me.cdA)+'s':'ready')+' | Pet [E] '+(me.cdP>0?Math.ceil(me.cdP)+'s':'ready');
+$('#hpb').style.width=Math.max(0,me.hp/me.h.hp*100)+'%';
+if(HAS_TOUCH){$('#bA i').style.height=Math.max(0,me.cdA/5*100)+'%';$('#bP i').style.height=Math.max(0,me.cdP/PETS[sel.p].cd*100)+'%'}}
+function draw(){const g=G,x=cx,w=cv.width,h=cv.height;x.fillStyle='#070914';x.fillRect(0,0,w,h);x.save();const sx=g.sx||0;x.translate(-g.cam.x+sx,-g.cam.y+sx);
+x.fillStyle='#0b0f2a';x.fillRect(0,0,W,H);x.strokeStyle='#1a2060';x.lineWidth=1;for(let i=0;i<=W;i+=100){x.beginPath();x.moveTo(i,0);x.lineTo(i,H);x.stroke()}for(let j=0;j<=H;j+=100){x.beginPath();x.moveTo(0,j);x.lineTo(W,j);x.stroke()}
+x.strokeStyle='#8a5cff';x.lineWidth=4;x.shadowColor='#8a5cff';x.shadowBlur=14;x.strokeRect(0,0,W,H);x.shadowBlur=0;
+OB.forEach((o,i)=>{x.fillStyle='#161b4a';x.fillRect(...o);x.strokeStyle=i%2?'#27e6ff':'#ff3fb4';x.lineWidth=2;x.strokeRect(...o)});
+const me=g.me,cat=me.act.cat>0;g.P.forEach(p=>{if(p.on&&(cat||Math.hypot(p.x-me.x,p.y-me.y)<170)){x.fillStyle='#4dffa0';x.shadowColor='#4dffa0';x.shadowBlur=12;x.fillRect(p.x-7,p.y-7,14,14);x.shadowBlur=0}});
+g.fx.forEach(f=>{x.globalAlpha=Math.min(1,f.t*3);x.strokeStyle=f.c;x.lineWidth=3;x.beginPath();x.arc(f.x,f.y,f.r*(1.2-f.t),0,7);x.stroke();x.globalAlpha=1});
+g.ents.forEach(e=>{if(e.hp<=0)return;const fox=me.act.fox>0&&e!=me&&Math.hypot(e.x-me.x,e.y-me.y)<380;x.save();if(e.inv>0)x.globalAlpha=.5+.3*Math.sin(performance.now()/60);
+if(e.fl>0){x.shadowColor='#fff';x.shadowBlur=24}if(fox){x.strokeStyle='#ffb02e';x.lineWidth=3;x.beginPath();x.arc(e.x,e.y,e.h.r+10,0,7);x.stroke()}
+drawHero(x,e.h,e.x,e.y,1,e.ang,0,WEPS[e.w].c);x.restore();
+if(e.act.shield>0){x.strokeStyle='#6dd5ff';x.lineWidth=3;x.beginPath();x.arc(e.x,e.y,e.h.r+8,0,7);x.stroke()}
+drawPet(x,PETS[e==me?sel.p:e.pi??1],e.pet.x,e.pet.y,1.2,performance.now()/1000);
+x.fillStyle='#000a';x.fillRect(e.x-20,e.y-e.h.r-14,40,5);x.fillStyle=e==me?'#27e6ff':'#ff3f6a';x.fillRect(e.x-20,e.y-e.h.r-14,40*Math.max(0,e.hp/e.h.hp),5);
+x.fillStyle='#cfd5ff';x.font='11px Rajdhani';x.textAlign='center';x.fillText(e.name,e.x,e.y-e.h.r-18)});
+g.B.forEach(b=>{x.fillStyle=b.w.c;x.shadowColor=b.w.c;x.shadowBlur=12;x.beginPath();x.arc(b.x,b.y,b.w.splash?7:3.5,0,7);x.fill();x.shadowBlur=0});drawAim(x,me);x.restore();drawSticks(x);
+if(me.hp<=0){x.fillStyle='#fff';x.font='700 28px Chakra Petch';x.textAlign='center';x.fillText('ELIMINATED - respawning',w/2,h/2)}}
+function finish(){const g=G;G=null;cv.style.display='none';$('#hud').style.display='none';$('#ab').style.display='none';
+const r=[...g.ents].sort((a,b)=>b.sc-a.sc||a.dt-b.dt);const win=r[0]==g.me;$('#rt').textContent=win?'VICTORY':'DEFEAT';
+$('#rtab').innerHTML='<tr><th>#</th><th>Player</th><th>Elims</th><th>Deaths</th></tr>'+r.map((e,i)=>'<tr class="'+(e==g.me?'me':'')+'"><td>'+(i+1)+'</td><td>'+e.name+'</td><td>'+e.sc+'</td><td>'+e.dt+'</td></tr>').join('');go('res');saveResult(g,win)}
+$('#go').onclick=start;$('#again').onclick=start;
+// ---- input (mouse and touch are handled separately)
+function sp(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height}}
+addEventListener('keydown',e=>{keys[e.code]=1;if(!G)return;if(e.code=='Space'){e.preventDefault();useA(G.me)}if(e.code=='KeyE')useP(G.me);if(e.code.startsWith('Digit')){const n=+e.code.slice(5)-1;if(n>=0&&n<3)G.me.w=n}if(e.code=='Escape'){finish()}});
+addEventListener('keyup',e=>keys[e.code]=0);addEventListener('blur',()=>{IN.fireM=false;keys={}});
+cv.addEventListener('pointerdown',e=>{if(!G)return;const p=sp(e);
+ if(e.pointerType=='touch'){IN.touchSeen=true;
+  if(p.x<cv.width/2){if(!IN.movS){IN.movS={id:e.pointerId,ox:p.x,oy:p.y,x:p.x,y:p.y,mag:0,a:0};cv.setPointerCapture(e.pointerId)}}
+  else if(!IN.aimS){IN.aimS={id:e.pointerId,ox:p.x,oy:p.y,x:p.x,y:p.y,mag:0,a:G.me.ang,t0:performance.now(),moved:false};IN.src='touch';cv.setPointerCapture(e.pointerId)}}
+ else{IN.src='mouse';IN.seen=true;IN.mx=p.x;IN.my=p.y;if(e.button==0)IN.fireM=true;try{cv.setPointerCapture(e.pointerId)}catch(_){}}});
+cv.addEventListener('pointermove',e=>{if(!G)return;const p=sp(e);
+ if(e.pointerType!='touch'){IN.src='mouse';IN.seen=true;IN.mx=p.x;IN.my=p.y;return}
+ for(const k of ['movS','aimS']){const s=IN[k];if(s&&s.id==e.pointerId){s.x=p.x;s.y=p.y;const dx=p.x-s.ox,dy=p.y-s.oy,l=Math.hypot(dx,dy);s.mag=Math.min(1,l/60);if(l>12)s.a=Math.atan2(dy,dx);if(l>14)s.moved=true;
+  if(k=='movS'){const m=l>10?s.mag:0;mv.x=Math.cos(s.a)*m;mv.y=Math.sin(s.a)*m}}}});
+function tapAim(p){const w=toWorld(p.x,p.y);let t=w;G.ents.forEach(o=>{if(o!=G.me&&o.hp>0&&Math.hypot(o.x-w.x,o.y-w.y)<70)t={x:o.x,y:o.y}});IN.tap={x:t.x,y:t.y,t:.35,done:false};IN.src='touch'}
+const up=e=>{const p=sp(e);if(e.pointerType!='touch'){if(e.button==0||e.type=='pointercancel')IN.fireM=false;return}
+ if(IN.movS&&IN.movS.id==e.pointerId){IN.movS=null;mv.x=mv.y=0}
+ if(IN.aimS&&IN.aimS.id==e.pointerId){const s=IN.aimS;IN.aimS=null;if(G&&e.type=='pointerup'&&!s.moved&&performance.now()-s.t0<300)tapAim(p)}};
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);cv.addEventListener('contextmenu',e=>e.preventDefault());
+$('#bA').onpointerdown=e=>{e.stopPropagation();G&&useA(G.me)};$('#bP').onpointerdown=e=>{e.stopPropagation();G&&useP(G.me)};$('#bW').onpointerdown=e=>{e.stopPropagation();if(G){G.me.w=(G.me.w+1)%3;$('#bW').textContent=WEPS[G.me.w].n.split(' ')[0]}};
+// ---- accounts (Supabase). Config: fill CFG0 for your hosted copy, or use the in-app setup screen for testing.
+const CFG0={url:'',key:'',site:''}; // site: your final website address, e.g. https://yourname.github.io/neon-strike/
+let SB=null,USER=null,PROF=null,T='in';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+function cfg(){try{const c=JSON.parse(localStorage.getItem('ns_cfg')||'{}');return{url:CFG0.url||c.url||'',key:CFG0.key||c.key||'',site:CFG0.site||c.site||''}}catch(e){return CFG0}}
+function siteUrl(){const s=cfg().site;return s||location.href.split('#')[0].split('?')[0]}
+function acct(){const h=!SB?'<button class="btn g" onclick="go(\'cfg\')">Set up accounts</button>':USER?'<span class="d">'+esc(PROF?PROF.username+' · Lv '+PROF.level:'Loading…')+'</span><button class="btn g" onclick="openProf()">Profile</button><button class="btn g" onclick="logout()">Log out</button>':'<button class="btn g" onclick="openAuth()">Sign in</button>';$$('.acct').forEach(a=>a.innerHTML=h)}
+function msg(t,ok){const m=$('#am');m.textContent=t;m.className='msg'+(ok?' ok':'')}
+function netErr(e){return/fetch|network|load/i.test(e.message||'')?"Can't reach the database. Check your internet and the URL/key. If you opened this from claude.ai, accounts only work on a copy you host yourself (see SETUP.md).":(e.message||'Something went wrong')}
+function tab(t){T=t;$('#at').textContent={in:'Sign in',up:'Create account',rec:'Reset password',newpw:'Choose a new password'}[t];$('#gu').style.display=t=='up'?'block':'none';$('#ge').style.display=t=='newpw'?'none':'block';$('#gp').style.display=t=='rec'?'none':'block';
+ $('#pw').autocomplete=t=='in'?'current-password':'new-password';$('#asub').textContent={in:'Sign in',up:'Create account',rec:'Send reset email',newpw:'Save password'}[t];msg('');
+ $('#tabs').innerHTML=t=='newpw'?'':[['in','Sign in'],['up','Create account'],['rec','Forgot password']].map(([k,l])=>'<button class="btn '+(k==t?'':'g')+'" data-t="'+k+'">'+l+'</button>').join('');$$('#tabs button').forEach(b=>b.onclick=()=>tab(b.dataset.t))}
+function openAuth(){if(!SB)return go('cfg');go('auth');tab('in')}
+$('#asub').onclick=async()=>{if(!SB)return msg('Accounts are not connected yet.');const em=$('#em').value.trim(),pw=$('#pw').value,un=$('#un').value.trim(),btn=$('#asub');
+ try{if(T!='rec'&&pw.length<8)return msg('Password needs 8 or more characters.');if(T=='up'&&!/^[A-Za-z0-9_]{3,16}$/.test(un))return msg('Username must be 3-16 letters, numbers or _.');if(T!='newpw'&&!/^\S+@\S+\.\S+$/.test(em)&&!(T=='rec'&&false))return msg('Enter a valid email.');
+  btn.disabled=true;msg('Working…');const back=siteUrl();let r;
+  if(T=='up'){r=await SB.auth.signUp({email:em,password:pw,options:{data:{username:un},emailRedirectTo:back}});if(r.error)return msg(r.error.message);msg('Account created. Open the confirmation link we emailed you, then sign in.',1)}
+  else if(T=='in'){r=await SB.auth.signInWithPassword({email:em,password:pw});if(r.error)return msg(r.error.message=='Email not confirmed'?'Confirm your email first: open the link we sent you.':r.error.message);$('#pw').value='';go('lobby')}
+  else if(T=='rec'){r=await SB.auth.resetPasswordForEmail(em,{redirectTo:back});if(r.error)return msg(r.error.message);msg('If that email has an account, a reset link is on its way.',1)}
+  else{r=await SB.auth.updateUser({password:pw});if(r.error)return msg(r.error.message);$('#pw').value='';msg('Password changed.',1);setTimeout(()=>go('lobby'),900)}
+ }catch(e){msg(netErr(e))}finally{btn.disabled=false}};
+async function loadProf(){try{const{data,error}=await SB.from('profiles').select('*').eq('id',USER.id).single();if(error)throw error;PROF=data;const s=data.settings||{};if(Number.isInteger(s.h)&&s.h>=0&&s.h<6)sel.h=s.h;if(Number.isInteger(s.p)&&s.p>=0&&s.p<4)sel.p=s.p;if(Number.isInteger(s.w)&&s.w>=0&&s.w<3)sel.w=s.w;if($('#s-lobby').classList.contains('on'))lobby()}catch(e){PROF=null}acct()}
+async function logout(){try{await SB.auth.signOut()}catch(e){}USER=PROF=null;acct();go('land')}
+async function openProf(){if(!PROF)return openAuth();go('prof');const lv=PROF.level,base=(lv-1)**2*100,nx=lv**2*100;$('#pn').textContent=PROF.username+' · Level '+lv;$('#px').style.width=Math.min(100,(PROF.xp-base)/(nx-base)*100)+'%';$('#pxt').textContent=PROF.xp+' / '+nx+' XP';
+ $('#pst').innerHTML=['matches','wins','losses','elims','deaths','win_streak'].map(k=>'<div><b>'+(+PROF[k]||0)+'</b>'+k.replace('_',' ')+'</div>').join('');
+ const{data}=await SB.from('match_history').select('*').order('created_at',{ascending:false}).limit(10);$('#ph').innerHTML=(data&&data.length?'<tr><th>Hero</th><th>Elims</th><th>Deaths</th><th>Result</th><th>XP</th></tr>'+data.map(m=>'<tr><td>'+esc(m.hero||'-')+'</td><td>'+(+m.elims)+'</td><td>'+(+m.deaths)+'</td><td>'+(m.won?'Win':'Loss')+'</td><td>+'+(+m.xp_gained)+'</td></tr>').join(''):'<tr><td>No matches saved yet. Play a practice match while signed in.</td></tr>')}
+async function delAcct(){if(!confirm('Delete your account and all saved progress? This cannot be undone.'))return;const{error}=await SB.rpc('delete_my_account');if(error)return alert(error.message);await logout()}
+async function saveResult(g,win){const rx=$('#rx');rx.style.display='block';if(!(SB&&USER&&PROF)){rx.textContent='Guest match: sign in to save XP, level and match history.';return}
+ rx.textContent='Saving your result…';const{data,error}=await SB.rpc('record_practice_match',{p_elims:g.me.sc,p_deaths:g.me.dt,p_won:win,p_hero:HEROES[sel.h].n,p_secs:Math.max(0,Math.min(180,Math.round(180-g.t)))});
+ if(error)rx.textContent='Could not save this match: '+error.message;else{rx.textContent='Saved: +'+data.gain+' XP. You are level '+data.level+'. (Practice results never affect rankings.)';loadProf()}}
+let svT;function saveSettings(){if(!(SB&&USER&&PROF))return;clearTimeout(svT);svT=setTimeout(()=>SB.rpc('save_settings',{p:{h:sel.h,p:sel.p,w:sel.w}}),800)}
+function checkKey(k){if(!k)throw Error('Paste your public key first.');
+ if(/^sb_secret_/.test(k))throw Error('That is a SECRET key (sb_secret_...). Never paste it here. Use the publishable key (sb_publishable_...).');
+ if(/^sb_publishable_[A-Za-z0-9_-]{8,}$/.test(k))return;
+ if(/^eyJ[\w-]+\.[\w-]+\.[\w-]+$/.test(k)){let r;try{r=JSON.parse(atob(k.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).role}catch(e){throw Error('That key does not look right. Copy it again.')}
+  if(r=='service_role')throw Error('That is the secret service_role key. Never paste it here. Use the publishable key instead.');if(r=='anon')return;throw Error('That legacy key is not an anon key.')}
+ throw Error('Key not recognised. It should start with sb_publishable_ (or eyJ for a legacy anon key).')}
+$('#csv').onclick=()=>{const u=$('#cu').value.trim(),k=$('#ck').value.trim(),m=$('#cm');m.className='msg';try{if(!/^https:\/\/[\w-]+\.supabase\.co\/?$/.test(u))throw Error('URL should look like https://abcd.supabase.co');checkKey(k);const st=$('#cs').value.trim();if(st&&!/^https:\/\/[^\s]+$/.test(st)&&!/^http:\/\/localhost/.test(st))throw Error('Website address must start with https://');
+ localStorage.setItem('ns_cfg',JSON.stringify({url:u.replace(/\/$/,''),key:k,site:st}));m.className='msg ok';m.textContent='Saved. Reloading…';location.reload()}catch(e){m.textContent=e.message}};
+async function initAuth(){if(window.supabase){const c=cfg();if(c.url&&c.key){try{SB=supabase.createClient(c.url,c.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ SB.auth.onAuthStateChange((ev,ses)=>{USER=ses?ses.user:null;if(ev=='PASSWORD_RECOVERY'){go('auth');tab('newpw')}else if(USER)setTimeout(loadProf,0);else{PROF=null;acct()}});
+ const{data}=await SB.auth.getSession();USER=data.session?data.session.user:null;if(USER)await loadProf()}catch(e){SB=null}}}acct()}
+lobby();acct();initAuth();
+</script></body></html>
