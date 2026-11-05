@@ -60,7 +60,7 @@ label{color:var(--mu);font-size:15px;display:block;margin-top:8px}
 <section class="scr on" id="s-land"><div class="hero">
 <h1>NEON STRIKE</h1><div class="sub d">BATTLE ARENA</div>
 <p class="l">Pick a hero and a robotic companion, then fight through a neon arena with energy weapons and special powers. Free to play in your browser.</p>
-<div class="row"><button class="btn" data-go="lobby">Play practice</button><button class="btn g" data-go="rules">Fair-play rules</button><span class="acct"></span></div>
+<div class="row"><button class="btn" data-go="lobby">Play practice</button><button class="btn g" data-go="rules">Fair-play rules</button><span class="acct"></span><button class="btn g" data-go="cfg">Account setup</button></div>
 <div class="feat"><div><b>6 original heroes</b>Three male, three female. Each has a power with a cooldown.</div><div><b>4 companions</b>Pets give limited help. They never aim or shoot.</div><div><b>3 energy weapons</b>Pulse, burst and plasma, each with its own feel.</div></div>
 <div class="note"><b>Build status:</b> this is the playable single-player practice arena (phase 1). Accounts and saved practice progress work once you connect a database (see SETUP.md). Online rooms and 10-player matches are not built yet. Opponents here are bots and are labelled BOT.</div>
 </div></section>
@@ -97,9 +97,16 @@ label{color:var(--mu);font-size:15px;display:block;margin-top:8px}
 <div id="gp"><label for="pw">Password (8 or more characters)</label><input id="pw" type="password"></div>
 <div class="msg" id="am" role="status"></div>
 <div class="row"><button class="btn" id="asub">Continue</button><button class="btn g" data-go="land">Back</button></div></div></section>
-<section class="scr" id="s-cfg"><div class="pg"><h2>Connect your database</h2><p class="l">Paste your Supabase Project URL and your publishable key (starts with sb_publishable_). A legacy anon key also works. Never paste a secret or service_role key. Steps are in SETUP.md.</p>
-<label for="cu">Project URL</label><input id="cu" placeholder="https://xxxx.supabase.co" autocomplete="off"><label for="ck">Publishable key</label><input id="ck"><label for="cs">Your website address for email links (optional, e.g. https://yourname.github.io/neon-strike/)</label><input id="cs" placeholder="leave empty to use this page's address" autocomplete="off"><div class="msg" id="cm"></div>
-<div class="row"><button class="btn" id="csv">Save and reload</button><button class="btn g" data-go="land">Back</button></div></div></section>
+<section class="scr" id="s-cfg"><div class="pg"><h2>Account setup</h2>
+<p class="l">Type your Supabase details here. No code editing needed. Use only the PUBLIC publishable key (starts with sb_publishable_). Never a secret or service_role key.</p>
+<div class="note" style="margin:0 0 12px">In Supabase: <b>Project Settings</b> then <b>API Keys</b> for the publishable key, and <b>Data API</b> (or General) for the Project URL.</div>
+<label for="cu">Project URL</label><input id="cu" placeholder="https://abcd.supabase.co" autocomplete="off" autocapitalize="off" spellcheck="false">
+<label for="ck">Publishable key</label><input id="ck" placeholder="sb_publishable_..." autocomplete="off" autocapitalize="off" spellcheck="false">
+<label for="cs">Website address for email links (optional)</label><input id="cs" placeholder="https://sanuragtech.github.io/Neon-strike/" autocomplete="off" autocapitalize="off" spellcheck="false">
+<div class="msg" id="cm" role="status"></div>
+<div class="row"><button class="btn" id="ctest">Test connection</button><button class="btn" id="csv">Save and reload</button></div>
+<div class="row" style="margin-top:10px"><button class="btn g" id="cclr">Remove saved setup</button><button class="btn g" data-go="land">Back</button></div>
+<p style="color:var(--mu);margin-top:14px">Saved on this device only. Each device or player that uses the game needs this once.</p></div></section>
 <section class="scr" id="s-prof"><div class="pg"><h2 id="pn"></h2><div class="xpb"><b id="px"></b></div><small id="pxt" style="color:var(--mu)"></small><div class="st" id="pst"></div><h3>Recent matches</h3><table id="ph" style="width:100%;border-collapse:collapse"></table>
 <div class="row" style="margin-top:18px"><button class="btn" data-go="lobby">Lobby</button><button class="btn g" onclick="logout()">Log out</button><button class="btn g" onclick="delAcct()">Delete account</button></div></div></section>
 <script>
@@ -134,7 +141,7 @@ const cv=b.firstChild;requestAnimationFrame(()=>thumb(cv,(x,cx,cy)=>key=='h'?dra
 function lobby(){card($('#heroes'),HEROES,'h',o=>(o.g=='M'?'Male':'Female')+' · '+o.role);card($('#pets'),PETS,'p',o=>o.d);card($('#weps'),WEPS,'w',o=>o.d);
 const h=HEROES[sel.h];$('#pvt').innerHTML='<h3>'+h.n+'</h3><div>'+h.bio+'</div><small style="color:var(--mu)">HP '+h.hp+' · Speed '+h.spd+' · '+ABN[h.ab]+'</small>'}
 let pvT=0;(function pv(t){const c=$('#pvc');if($('#s-lobby').classList.contains('on')){const x=c.getContext('2d');x.clearRect(0,0,240,240);drawHero(x,HEROES[sel.h],120,120,3.4,t/700,t,WEPS[sel.w].c);drawPet(x,PETS[sel.p],190+Math.cos(t/500)*10,170,3,t/1000)}requestAnimationFrame(pv)})(0);
-function go(n){$$('.scr').forEach(s=>s.classList.toggle('on',s.id=='s-'+n));if(n=='lobby')lobby()}
+function go(n){$$('.scr').forEach(s=>s.classList.toggle('on',s.id=='s-'+n));if(n=='lobby')lobby();if(n=='cfg')cfgFill()}
 $$('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 // ---- background particles
 (function(){const c=$('#bgc'),x=c.getContext('2d');let P=[];function rs(){c.width=innerWidth;c.height=innerHeight;P=Array.from({length:50},()=>({x:Math.random()*c.width,y:Math.random()*c.height,v:8+Math.random()*20,r:Math.random()*1.6+.4}))}rs();addEventListener('resize',rs);
@@ -154,7 +161,7 @@ function playerAim(e,dt){let t=e.ang,snap=false;
  else if(IN.src=='touch'){if(IN.aimS&&IN.aimS.mag>.2)t=IN.aimS.a}
  else if(IN.seen){const w=toWorld(IN.mx,IN.my);G.tw=w;t=Math.atan2(w.y-e.y,w.x-e.x)}
  e.aim=t;turn(e,t,dt,snap)}
-function wantFire(e){const ok=angDiff(e.ang,e.aim)<.5;
+function wantFire(e){const ok=angDiff(e.ang,e.aim)<.1;
  if(IN.tap&&IN.tap.t>0&&!IN.tap.done){if(ok&&e.cdW<=0){IN.tap.done=true;return true}return false}
  const f=IN.src=='mouse'?IN.fireM:!!(IN.aimS&&IN.aimS.mag>.2);return ok&&f}
 function drawAim(x,me){if(me.hp<=0)return;const mouse=IN.src=='mouse'&&IN.seen&&G.tw;const L=mouse?Math.min(Math.hypot(G.tw.x-me.x,G.tw.y-me.y),520):240;
@@ -244,12 +251,13 @@ const up=e=>{const p=sp(e);if(e.pointerType!='touch'){if(e.button==0||e.type=='p
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);cv.addEventListener('contextmenu',e=>e.preventDefault());
 $('#bA').onpointerdown=e=>{e.stopPropagation();G&&useA(G.me)};$('#bP').onpointerdown=e=>{e.stopPropagation();G&&useP(G.me)};$('#bW').onpointerdown=e=>{e.stopPropagation();if(G){G.me.w=(G.me.w+1)%3;$('#bW').textContent=WEPS[G.me.w].n.split(' ')[0]}};
 // ---- accounts (Supabase). Config: fill CFG0 for your hosted copy, or use the in-app setup screen for testing.
-const CFG0={url:'',key:'',site:''}; // site: your final website address, e.g. https://yourname.github.io/neon-strike/
-let SB=null,USER=null,PROF=null,T='in';
+// Fill url and key with your Supabase Project URL and PUBLISHABLE key (sb_publishable_...). Never put a secret or service_role key here.
+const CFG0={url:'',key:'',site:'https://sanuragtech.github.io/Neon-strike/'};
+let SB=null,USER=null,PROF=null,PROFERR='',T='in';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-function cfg(){try{const c=JSON.parse(localStorage.getItem('ns_cfg')||'{}');return{url:CFG0.url||c.url||'',key:CFG0.key||c.key||'',site:CFG0.site||c.site||''}}catch(e){return CFG0}}
+function cfg(){try{const c=JSON.parse(localStorage.getItem('ns_cfg')||'{}');return{url:c.url||CFG0.url||'',key:c.key||CFG0.key||'',site:c.site||CFG0.site||''}}catch(e){return CFG0}}
 function siteUrl(){const s=cfg().site;return s||location.href.split('#')[0].split('?')[0]}
-function acct(){const h=!SB?'<button class="btn g" onclick="go(\'cfg\')">Set up accounts</button>':USER?'<span class="d">'+esc(PROF?PROF.username+' · Lv '+PROF.level:'Loading…')+'</span><button class="btn g" onclick="openProf()">Profile</button><button class="btn g" onclick="logout()">Log out</button>':'<button class="btn g" onclick="openAuth()">Sign in</button>';$$('.acct').forEach(a=>a.innerHTML=h)}
+function acct(){const h=!SB?'<button class="btn g" onclick="go(\'cfg\')">Set up accounts</button>':USER?'<span class="d">'+esc(PROF?PROF.username+' · Lv '+PROF.level+' · '+PROF.xp+' XP · W'+PROF.wins+' L'+PROF.losses:(PROFERR||'Loading…'))+'</span><button class="btn g" onclick="openProf()">Profile</button><button class="btn g" onclick="logout()">Log out</button>':'<button class="btn g" onclick="openAuth()">Sign in</button>';$$('.acct').forEach(a=>a.innerHTML=h)}
 function msg(t,ok){const m=$('#am');m.textContent=t;m.className='msg'+(ok?' ok':'')}
 function netErr(e){return/fetch|network|load/i.test(e.message||'')?"Can't reach the database. Check your internet and the URL/key. If you opened this from claude.ai, accounts only work on a copy you host yourself (see SETUP.md).":(e.message||'Something went wrong')}
 function tab(t){T=t;$('#at').textContent={in:'Sign in',up:'Create account',rec:'Reset password',newpw:'Choose a new password'}[t];$('#gu').style.display=t=='up'?'block':'none';$('#ge').style.display=t=='newpw'?'none':'block';$('#gp').style.display=t=='rec'?'none':'block';
@@ -259,12 +267,13 @@ function openAuth(){if(!SB)return go('cfg');go('auth');tab('in')}
 $('#asub').onclick=async()=>{if(!SB)return msg('Accounts are not connected yet.');const em=$('#em').value.trim(),pw=$('#pw').value,un=$('#un').value.trim(),btn=$('#asub');
  try{if(T!='rec'&&pw.length<8)return msg('Password needs 8 or more characters.');if(T=='up'&&!/^[A-Za-z0-9_]{3,16}$/.test(un))return msg('Username must be 3-16 letters, numbers or _.');if(T!='newpw'&&!/^\S+@\S+\.\S+$/.test(em)&&!(T=='rec'&&false))return msg('Enter a valid email.');
   btn.disabled=true;msg('Working…');const back=siteUrl();let r;
-  if(T=='up'){r=await SB.auth.signUp({email:em,password:pw,options:{data:{username:un},emailRedirectTo:back}});if(r.error)return msg(r.error.message);msg('Account created. Open the confirmation link we emailed you, then sign in.',1)}
+  if(T=='up'){r=await SB.auth.signUp({email:em,password:pw,options:{data:{username:un},emailRedirectTo:back}});if(r.error)return msg(r.error.message);const u=r.data&&r.data.user;if(u&&u.identities&&u.identities.length===0)return msg('That email is already registered. Try signing in or resetting your password.');if(r.data&&r.data.session){go('lobby')}else msg('Account created. Open the confirmation link we emailed you, then sign in.',1)}
   else if(T=='in'){r=await SB.auth.signInWithPassword({email:em,password:pw});if(r.error)return msg(r.error.message=='Email not confirmed'?'Confirm your email first: open the link we sent you.':r.error.message);$('#pw').value='';go('lobby')}
   else if(T=='rec'){r=await SB.auth.resetPasswordForEmail(em,{redirectTo:back});if(r.error)return msg(r.error.message);msg('If that email has an account, a reset link is on its way.',1)}
   else{r=await SB.auth.updateUser({password:pw});if(r.error)return msg(r.error.message);$('#pw').value='';msg('Password changed.',1);setTimeout(()=>go('lobby'),900)}
  }catch(e){msg(netErr(e))}finally{btn.disabled=false}};
-async function loadProf(){try{const{data,error}=await SB.from('profiles').select('*').eq('id',USER.id).single();if(error)throw error;PROF=data;const s=data.settings||{};if(Number.isInteger(s.h)&&s.h>=0&&s.h<6)sel.h=s.h;if(Number.isInteger(s.p)&&s.p>=0&&s.p<4)sel.p=s.p;if(Number.isInteger(s.w)&&s.w>=0&&s.w<3)sel.w=s.w;if($('#s-lobby').classList.contains('on'))lobby()}catch(e){PROF=null}acct()}
+async function loadProf(){PROFERR='';try{let r=await SB.from('profiles').select('*').eq('id',USER.id).maybeSingle();if(!r.error&&!r.data){await new Promise(z=>setTimeout(z,800));r=await SB.from('profiles').select('*').eq('id',USER.id).maybeSingle()}
+ if(r.error)throw r.error;if(!r.data)throw Error('Profile row not found. Re-run the setup SQL, then sign up again.');const data=r.data;PROF=data;const s=data.settings||{};if(Number.isInteger(s.h)&&s.h>=0&&s.h<6)sel.h=s.h;if(Number.isInteger(s.p)&&s.p>=0&&s.p<4)sel.p=s.p;if(Number.isInteger(s.w)&&s.w>=0&&s.w<3)sel.w=s.w;if($('#s-lobby').classList.contains('on'))lobby()}catch(e){PROF=null;PROFERR='Profile error: '+(e.message||e)}acct()}
 async function logout(){try{await SB.auth.signOut()}catch(e){}USER=PROF=null;acct();go('land')}
 async function openProf(){if(!PROF)return openAuth();go('prof');const lv=PROF.level,base=(lv-1)**2*100,nx=lv**2*100;$('#pn').textContent=PROF.username+' · Level '+lv;$('#px').style.width=Math.min(100,(PROF.xp-base)/(nx-base)*100)+'%';$('#pxt').textContent=PROF.xp+' / '+nx+' XP';
  $('#pst').innerHTML=['matches','wins','losses','elims','deaths','win_streak'].map(k=>'<div><b>'+(+PROF[k]||0)+'</b>'+k.replace('_',' ')+'</div>').join('');
@@ -280,8 +289,18 @@ function checkKey(k){if(!k)throw Error('Paste your public key first.');
  if(/^eyJ[\w-]+\.[\w-]+\.[\w-]+$/.test(k)){let r;try{r=JSON.parse(atob(k.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).role}catch(e){throw Error('That key does not look right. Copy it again.')}
   if(r=='service_role')throw Error('That is the secret service_role key. Never paste it here. Use the publishable key instead.');if(r=='anon')return;throw Error('That legacy key is not an anon key.')}
  throw Error('Key not recognised. It should start with sb_publishable_ (or eyJ for a legacy anon key).')}
-$('#csv').onclick=()=>{const u=$('#cu').value.trim(),k=$('#ck').value.trim(),m=$('#cm');m.className='msg';try{if(!/^https:\/\/[\w-]+\.supabase\.co\/?$/.test(u))throw Error('URL should look like https://abcd.supabase.co');checkKey(k);const st=$('#cs').value.trim();if(st&&!/^https:\/\/[^\s]+$/.test(st)&&!/^http:\/\/localhost/.test(st))throw Error('Website address must start with https://');
- localStorage.setItem('ns_cfg',JSON.stringify({url:u.replace(/\/$/,''),key:k,site:st}));m.className='msg ok';m.textContent='Saved. Reloading…';location.reload()}catch(e){m.textContent=e.message}};
+function readCfg(){const u=$('#cu').value.trim().replace(/\/$/,''),k=$('#ck').value.trim().replace(/^["']|["']$/g,''),st=$('#cs').value.trim();
+ if(!/^https:\/\/[\w-]+\.supabase\.co$/.test(u))throw Error('Project URL should look like https://abcd.supabase.co');checkKey(k);
+ if(st&&!/^https:\/\/[^\s]+$/.test(st)&&!/^http:\/\/localhost/.test(st))throw Error('Website address must start with https://');return{url:u,key:k,site:st}}
+function cmsg(t,ok){const m=$('#cm');m.textContent=t;m.className='msg'+(ok?' ok':'')}
+function cfgFill(){const c=cfg();$('#cu').value=c.url;$('#ck').value=c.key;$('#cs').value=c.site;cmsg('')}
+$('#csv').onclick=()=>{try{const c=readCfg();localStorage.setItem('ns_cfg',JSON.stringify(c));cmsg('Saved. Reloading…',1);setTimeout(()=>location.reload(),400)}catch(e){cmsg(e.message)}};
+$('#cclr').onclick=()=>{localStorage.removeItem('ns_cfg');cmsg('Saved setup removed. Reloading…',1);setTimeout(()=>location.reload(),400)};
+$('#ctest').onclick=async()=>{let c;try{c=readCfg()}catch(e){return cmsg(e.message)}cmsg('Testing…');
+ const f=async p=>{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),8000);try{return await fetch(c.url+p,{headers:{apikey:c.key},signal:ac.signal})}finally{clearTimeout(t)}};
+ try{const a=await f('/auth/v1/settings');if(a.status==401||a.status==403)return cmsg('Supabase rejected this key. Copy the publishable key again.');if(!a.ok)return cmsg('Unexpected answer from Supabase (code '+a.status+'). Check the Project URL.');
+  const r=await f('/rest/v1/profiles?select=id&limit=1');if(r.status==404)return cmsg('Connected and key accepted, but the profiles table was not found. Run supabase-setup.sql in the SQL Editor.');
+  cmsg('Connected. Key accepted'+(r.ok||r.status==401||r.status==403?' and the database tables are there':'')+'. Now tap Save and reload.',1)}catch(e){cmsg("Can't reach Supabase. Check your internet and the Project URL.")}};
 async function initAuth(){if(window.supabase){const c=cfg();if(c.url&&c.key){try{SB=supabase.createClient(c.url,c.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  SB.auth.onAuthStateChange((ev,ses)=>{USER=ses?ses.user:null;if(ev=='PASSWORD_RECOVERY'){go('auth');tab('newpw')}else if(USER)setTimeout(loadProf,0);else{PROF=null;acct()}});
  const{data}=await SB.auth.getSession();USER=data.session?data.session.user:null;if(USER)await loadProf()}catch(e){SB=null}}}acct()}
